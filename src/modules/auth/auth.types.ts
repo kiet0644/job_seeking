@@ -4,6 +4,7 @@ export interface IUser {
   id: string;
   email: string;
   passwordHash: string;
+  emailVerified?: boolean; // Thêm trạng thái xác thực email
 }
 
 export interface IUserPayload {
@@ -21,6 +22,15 @@ export interface IAuthLoginBody {
   password: string;
 }
 
+export interface IAuthPasswordResetBody {
+  email: string;
+}
+
+export interface IAuthChangePasswordBody {
+  userId: string;
+  newPassword: string;
+}
+
 export interface AuthRequest extends Request {
-  user?: IUserPayload;
+  user?: IUserPayload; // Thông tin người dùng được gắn vào request sau khi xác thực
 }

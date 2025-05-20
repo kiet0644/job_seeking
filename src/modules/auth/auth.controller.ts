@@ -1,6 +1,13 @@
 // src/modules/auth/auth.controller.ts
 import { Request, Response } from 'express';
-import { registerUser, loginUser } from './auth.service.js';
+import {
+  registerUser,
+  loginUser,
+  sendPasswordReset,
+  changePassword,
+  verifyEmail,
+  logout,
+} from './auth.service.js';
 import { IAuthRegisterBody, IAuthLoginBody } from './auth.types.js';
 
 /**
@@ -47,4 +54,80 @@ export async function login(req: Request, res: Response): Promise<void> {
     return;
   }
   res.json({ token: result.token });
+}
+
+/**
+ * Handles sending password reset email.
+ */
+export async function handlePasswordReset(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const { email } = req.body;
+  const result = await sendPasswordReset(email);
+  console.log('Password reset result:', result);
+  if ('error' in result) {
+    res.status(400).json(result);
+    return;
+  }
+
+  res.status(200).json(result);
+}
+
+/**
+ * Handles password change.
+ */
+export async function handleChangePassword(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const { newPassword } = req.body;
+  const userId = req.user?.id; // Lấy userId từ token (middleware authenticateToken phải gắn user vào req)
+
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const result = await changePassword(userId, newPassword);
+  res.status(200).json(result);
+}
+
+/**
+ * Handles email verification.
+ */
+export async function handleVerifyEmail(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const { token } = req.query;
+
+  if (!token || typeof token !== 'string') {
+    res.status(400).json({ error: 'Invalid token' });
+    return;
+  }
+
+  const result = await verifyEmail(token);
+
+  if ('error' in result) {
+    res.status(400).json(result);
+    return;
+  }
+
+  res.status(200).json(result);
+}
+
+/**
+ * Handles user logout.
+ */
+export async function handleLogout(req: Request, res: Response): Promise<void> {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    res.status(400).json({ error: 'Token is required' });
+    return;
+  }
+
+  const result = await logout(token);
+  res.status(200).json(result);
 }

@@ -3,12 +3,80 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id           String  @id @default(uuid())
-  email        String  @unique
-  passwordHash String
+  id             String   @id @map("_id") @default(auto()) @db.ObjectId
+  email          String   @unique
+  passwordHash   String
+  fullName       String
+  phone          String?
+  avatar         String?
+  address        String?
+  role           String   @default("job_seeker") // job_seeker | employer
+  emailVerified  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  resetToken     String?  // Token đặt lại mật khẩu (nếu có)
+  resetTokenExpiry DateTime? // Thời gian hết hạn của resetToken
+
+  // Quan hệ với các bảng khác
+  jobSeekerProfile JobSeekerProfile?
+  employerProfile  EmployerProfile?
+  applications     Application[]
+}
+
+model JobSeekerProfile {
+  id               String   @id @map("_id") @default(auto()) @db.ObjectId
+  userId           String   @unique
+  education        String[]
+  skills           String[]
+  careerObjective  String?
+
+  // Quan hệ với User
+  user             User     @relation(fields: [userId], references: [id])
+
+  // Quan hệ với Experience
+  experiences      Experience[]
+}
+
+model Experience {
+  id                String   @id @map("_id") @default(auto()) @db.ObjectId
+  company           String
+  position          String
+  startDate         DateTime
+  endDate           DateTime?
+  description       String
+
+  // Quan hệ với JobSeekerProfile
+  jobSeekerProfileId String
+  jobSeekerProfile   JobSeekerProfile @relation(fields: [jobSeekerProfileId], references: [id])
+}
+
+model EmployerProfile {
+  id               String   @id @map("_id") @default(auto()) @db.ObjectId
+  userId           String   @unique
+  companyName      String
+  companyAddress   String
+  companyWebsite   String?
+  companyLogo      String?
+  contactPerson    String
+  contactEmail     String
+  contactPhone     String
+
+  // Quan hệ với User
+  user             User     @relation(fields: [userId], references: [id])
+}
+
+model Application {
+  id               String   @id @map("_id") @default(auto()) @db.ObjectId
+  userId           String
+  jobId            String
+  status           String   @default("pending") // pending | accepted | rejected
+  appliedAt        DateTime @default(now())
+
+  // Quan hệ với User
+  user             User     @relation(fields: [userId], references: [id])
 }
