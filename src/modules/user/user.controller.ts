@@ -1,9 +1,33 @@
 import { Request, Response } from 'express';
 import {
+  createUserProfile,
   getUserProfile,
   updateUserProfile,
   getUserApplications,
 } from './user.service.js';
+
+/**
+ * Handles creating user profile.
+ */
+export async function handleCreateUserProfile(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const profile = await createUserProfile(userId, req.body);
+    res.status(201).json(profile);
+  } catch (error) {
+    console.error('Error creating user profile:', error);
+    res.status(500).json({ error: 'Failed to create user profile' });
+  }
+}
 
 /**
  * Handles fetching user profile.
