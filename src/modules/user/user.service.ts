@@ -63,7 +63,7 @@ export async function createUserProfile(
     throw new Error('User not found');
   }
 
-  if (user.role === Role.JOB_SEEKER) {
+  if (user.role === Role.JOB_SEEKER || user.role === Role.PREMIUM_JOB_SEEKER) {
     const profile = await prisma.jobSeekerProfile.create({
       data: {
         userId,
@@ -73,7 +73,10 @@ export async function createUserProfile(
       },
     });
     return profile;
-  } else if (user.role === Role.EMPLOYER) {
+  } else if (
+    user.role === Role.EMPLOYER ||
+    user.role === Role.PREMIUM_EMPLOYER
+  ) {
     if (
       !data.companyName ||
       !data.companyAddress ||

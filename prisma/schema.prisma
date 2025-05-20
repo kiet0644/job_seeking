@@ -10,6 +10,10 @@ datasource db {
 enum Role {
   JOB_SEEKER
   EMPLOYER
+  ADMIN
+  MODERATOR
+  PREMIUM_JOB_SEEKER
+  PREMIUM_EMPLOYER
 }
 
 model User {
@@ -20,7 +24,7 @@ model User {
   phone          String?
   avatar         String?
   address        String?
-  role           Role     @default(JOB_SEEKER) // Sử dụng enum Role
+  role           Role     @default(JOB_SEEKER)
   emailVerified  Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
