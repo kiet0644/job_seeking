@@ -8,6 +8,7 @@ import {
   IAuthRegisterBody,
   IAuthLoginBody,
 } from './auth.types.js';
+import { Role } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -17,6 +18,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 export async function registerUser({
   email,
   password,
+  fullName,
+  role,
+  avatar,
+  address,
+  phone,
 }: IAuthRegisterBody): Promise<{ message: string } | { error: string }> {
   const existingUser = await prisma.user.findUnique({ where: { email } });
 
@@ -26,14 +32,26 @@ export async function registerUser({
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       passwordHash: hashedPassword,
+      fullName,
+      role: role || Role.JOB_SEEKER,
+      avatar: avatar || null,
+      address: address || null,
+      phone: phone || null,
+      emailVerified: false,
     },
   });
 
-  return { message: 'User registered successfully' };
+  // Gửi email xác thực bằng hàm đã có template đẹp
+  await sendVerificationEmail(email);
+
+  return {
+    message:
+      'User registered successfully. Please check your email to verify your account.',
+  };
 }
 
 /**
@@ -152,4 +170,61 @@ export async function logout(token: string): Promise<{ message: string }> {
   // TODO: Thêm token vào danh sách đen (blacklist) nếu cần
   console.log(`Token blacklisted: ${token}`);
   return { message: 'Logged out successfully' };
+}
+
+/**
+ * Gửi email xác thực
+ */
+export async function sendVerificationEmail(
+  email: string
+): Promise<{ message: string } | { error: string }> {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    return { error: 'Email does not exist' };
+  }
+
+  const verifyToken = jwt.sign({ id: user.id }, JWT_SECRET, {
+    expiresIn: '1d',
+  });
+
+  const verifyLink = `https://your-app.com/verify-email?token=${verifyToken}`;
+  const subject = 'Verify Your Email Address';
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; background: #f7f7f7; padding: 40px 0;">
+      <div style="max-width: 480px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px;">
+        <div style="text-align: center;">
+          <img src="https://cdn-icons-png.flaticon.com/512/561/561127.png" alt="Verify Email" width="64" style="margin-bottom: 16px;" />
+          <h2 style="color: #4CAF50; margin-bottom: 8px;">Verify Your Email</h2>
+        </div>
+        <p style="font-size: 16px; color: #333; margin-bottom: 24px;">
+          Hi,<br>
+          Thank you for registering! Please verify your email address to activate your account.
+        </p>
+        <div style="text-align: center; margin-bottom: 24px;">
+          <a href="${verifyLink}" style="background: #4CAF50; color: #fff; text-decoration: none; padding: 12px 32px; border-radius: 5px; font-size: 16px; display: inline-block;">
+            Verify Email
+          </a>
+        </div>
+        <p style="font-size: 14px; color: #555;">
+          If the button above doesn't work, copy and paste this link into your browser:<br>
+          <a href="${verifyLink}" style="color: #4CAF50;">${verifyLink}</a>
+        </p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;">
+        <p style="font-size: 12px; color: #999; text-align: center;">
+          If you did not create an account, you can safely ignore this email.<br>
+          &copy; ${new Date().getFullYear()} Job Seeking App
+        </p>
+      </div>
+    </div>
+  `;
+
+  try {
+    await sendEmail(email, subject, '', html);
+    return { message: 'Verification email sent' };
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return { error: 'Failed to send email' };
+  }
 }

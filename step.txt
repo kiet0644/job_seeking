@@ -1,0 +1,8 @@
+mở cmd (admin)
+net stop MongoDB
+cd "C:\Program Files\MongoDB\Server\8.0\bin"
+mongod --replSet rs0 --bind_ip 127.0.0.1 --port 27017
+
+mở cmd khác
+mongosh
+rs.initiate()

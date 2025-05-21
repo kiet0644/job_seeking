@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { Role } from '@prisma/client';
 
 export interface IUser {
   id: string;
@@ -15,6 +16,11 @@ export interface IUserPayload {
 export interface IAuthRegisterBody {
   email: string;
   password: string;
+  fullName: string;
+  role?: Role; // Sử dụng enum Role thay vì string
+  avatar?: string;
+  address?: string;
+  phone?: string;
 }
 
 export interface IAuthLoginBody {
