@@ -1,5 +1,6 @@
 import express from 'express';
 import authRouter from '@/modules/auth/auth.routes.js';
+import userRouter from '@/modules/user/user.routes.js';
 import { connectDB } from '@/config/db.js';
 
 async function startServer() {
@@ -11,6 +12,7 @@ async function startServer() {
     app.use(express.json());
 
     app.use('/auth', authRouter);
+    app.use('/user', userRouter);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
