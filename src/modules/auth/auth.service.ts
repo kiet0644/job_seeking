@@ -1,13 +1,9 @@
 // src/modules/auth/auth.service.ts
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import prisma from '@/prismaClient.js';
-import { sendEmail } from '@/utils/email.service.js';
-import {
-  IUserPayload,
-  IAuthRegisterBody,
-  IAuthLoginBody,
-} from './auth.types.js';
+import prisma from '@/prismaClient';
+import { sendEmail } from '@/utils/email.service';
+import { IUserPayload, IAuthRegisterBody, IAuthLoginBody } from './auth.types';
 import { Role } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';

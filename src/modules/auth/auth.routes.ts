@@ -7,8 +7,8 @@ import {
   handleChangePassword,
   handleVerifyEmail,
   handleLogout,
-} from './auth.controller.js';
-import { authenticateToken } from './auth.middleware.js';
+} from './auth.controller';
+import { authenticateToken } from './auth.middleware';
 
 const router = Router();
 

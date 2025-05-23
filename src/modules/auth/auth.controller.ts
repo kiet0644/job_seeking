@@ -7,8 +7,7 @@ import {
   changePassword,
   verifyEmail,
   logout,
-} from './auth.service.js';
-import { IAuthRegisterBody, IAuthLoginBody } from './auth.types.js';
+} from './auth.service';
 
 /**
  * Handles user registration.

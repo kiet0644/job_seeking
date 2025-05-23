@@ -1,7 +1,7 @@
 // src/modules/auth/auth.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { IUserPayload } from './auth.types.js';
+import { IUserPayload } from './auth.types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 

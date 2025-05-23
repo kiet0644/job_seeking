@@ -3,7 +3,7 @@ import {
   createUserProfile,
   getUserProfile,
   updateUserProfile,
-} from './user.service.js';
+} from './user.service';
 
 /**
  * Handles creating user profile.

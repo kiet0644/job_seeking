@@ -1,5 +1,5 @@
-import prisma from '@/prismaClient.js';
-import { IUserProfileCreate, IUserProfileUpdate } from './user.types.js';
+import prisma from '@/prismaClient';
+import { IUserProfileCreate, IUserProfileUpdate } from './user.types';
 import { Role } from '@prisma/client';
 
 /**

@@ -3,9 +3,9 @@ import {
   handleGetUserProfile,
   handleUpdateUserProfile,
   handleCreateUserProfile,
-} from './user.controller.js';
-import { authenticateToken } from '../auth/auth.middleware.js';
-import { authorizeRole } from './user.middleware.js';
+} from './user.controller';
+import { authenticateToken } from '../auth/auth.middleware';
+import { authorizeRole } from './user.middleware';
 import { Role } from '@prisma/client';
 
 const router = Router();
