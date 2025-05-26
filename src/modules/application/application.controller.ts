@@ -1,25 +1,34 @@
 import { Request, Response } from 'express';
 import * as applicationService from './application.service';
+import { AuthRequest } from '@/modules/auth/auth.types';
 
-export async function handleCreateApplication(req: Request, res: Response) {
+export async function handleCreateApplication(req: AuthRequest, res: Response) {
   try {
-    const application = await applicationService.createApplication(req.body);
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    // Kiểm tra đã ứng tuyển chưa
+    const existed = await applicationService.findByUserAndJob(
+      userId,
+      req.body.jobId
+    );
+    if (existed) return res.status(409).json({ error: 'Already applied' });
+    const application = await applicationService.createApplication({
+      ...req.body,
+      userId,
+    });
     res.status(201).json(application);
   } catch {
     res.status(400).json({ error: 'Failed to create application' });
   }
 }
 
-export async function handleGetApplicationsByUser(req: Request, res: Response) {
-  const userId = req.params.userId;
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 20;
-  const applications = await applicationService.getApplicationsByUser(
-    userId,
-    page,
-    limit
-  );
-  res.json(applications);
+export async function handleGetApplicationsByUser(
+  req: AuthRequest,
+  res: Response
+) {
+  const userId = req.user?.id;
+  // Nếu là admin thì cho phép truyền userId qua params, còn lại chỉ cho xem của chính mình
+  // ...
 }
 
 export async function handleGetApplicationsByJob(req: Request, res: Response) {

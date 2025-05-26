@@ -61,3 +61,12 @@ export async function updateApplicationStatus(
 export async function deleteApplication(applicationId: string) {
   return prisma.application.delete({ where: { id: applicationId } });
 }
+
+/**
+ * Kiểm tra user đã ứng tuyển vào job chưa
+ */
+export async function findByUserAndJob(userId: string, jobId: string) {
+  return prisma.application.findFirst({
+    where: { userId, jobId },
+  });
+}
