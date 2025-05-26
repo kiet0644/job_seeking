@@ -8,7 +8,6 @@ import {
   verifyEmail,
   logout,
 } from './auth.service';
-import { AuthRequest } from './auth.types'; // <-- Thêm dòng này
 import { registerSchema } from './auth.validation';
 
 /**
@@ -91,7 +90,7 @@ export async function handlePasswordReset(
  * Handles password change.
  */
 export async function handleChangePassword(
-  req: AuthRequest, // <-- Đổi từ Request sang AuthRequest
+  req: Request,
   res: Response
 ): Promise<void> {
   const { newPassword } = req.body;

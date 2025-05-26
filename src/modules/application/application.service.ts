@@ -18,7 +18,10 @@ export async function getApplicationsByUser(
 ) {
   return prisma.application.findMany({
     where: { userId },
-    include: { job: true },
+    include: {
+      resume: true,
+      job: true, // <-- Thêm dòng này để trả về cả thông tin job
+    },
     orderBy: { appliedAt: 'desc' },
     skip: (page - 1) * limit,
     take: limit,

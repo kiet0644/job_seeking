@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import * as jobService from './job.service';
 import { jobCreateSchema, jobUpdateSchema } from './job.validation';
-import { AuthRequest } from '../auth/auth.types';
 
-export async function handleCreateJob(req: AuthRequest, res: Response) {
+export async function handleCreateJob(req: Request, res: Response) {
   try {
     jobCreateSchema.parse(req.body);
     const employerId = req.user?.id;
@@ -36,7 +35,7 @@ export async function handleGetJobById(req: Request, res: Response) {
   }
 }
 
-export async function handleUpdateJob(req: AuthRequest, res: Response) {
+export async function handleUpdateJob(req: Request, res: Response) {
   try {
     const job = await jobService.getJobById(req.params.id);
     if (job.employerId !== req.user?.id) {
