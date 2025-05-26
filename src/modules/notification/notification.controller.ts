@@ -1,12 +1,26 @@
 import { Request, Response } from 'express';
 import * as notificationService from './notification.service';
 
+export async function markAllRead(req: Request, res: Response) {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  await notificationService.markAllRead(userId);
+  res.json({ message: 'All notifications marked as read' });
+}
+
 export async function getUserNotifications(req: Request, res: Response) {
   const userId = req.user?.id;
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
   }
-  const notifications = await notificationService.getUserNotifications(userId);
+  // Phân trang
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 20;
+  const notifications = await notificationService.getUserNotifications(userId, page, limit);
   res.json(notifications);
 }
 
@@ -14,7 +28,8 @@ export async function markNotificationRead(req: Request, res: Response) {
   const userId = req.user?.id;
   const notificationId = req.params.id;
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
   }
   try {
     const notification = await notificationService.markNotificationRead(
@@ -30,7 +45,8 @@ export async function markNotificationRead(req: Request, res: Response) {
 export async function createNotification(req: Request, res: Response) {
   const { userId, content } = req.body;
   if (!userId || !content) {
-    return res.status(400).json({ error: 'Missing userId or content' });
+    res.status(400).json({ error: 'Missing userId or content' });
+    return;
   }
   const notification = await notificationService.createNotification(
     userId,
@@ -42,7 +58,10 @@ export async function createNotification(req: Request, res: Response) {
 export async function deleteNotification(req: Request, res: Response) {
   const userId = req.user?.id;
   const notificationId = req.params.id;
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
   try {
     await notificationService.deleteNotification(notificationId, userId);
     res.json({ message: 'Deleted' });

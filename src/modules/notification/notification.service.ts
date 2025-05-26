@@ -1,9 +1,11 @@
 import prisma from '@/prismaClient';
 
-export async function getUserNotifications(userId: string) {
+export async function getUserNotifications(userId: string, page = 1, limit = 20) {
   return prisma.notification.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
+    skip: (page - 1) * limit,
+    take: limit,
   });
 }
 
@@ -20,6 +22,13 @@ export async function markNotificationRead(
   }
   return prisma.notification.update({
     where: { id: notificationId },
+    data: { read: true },
+  });
+}
+
+export async function markAllRead(userId: string) {
+  return prisma.notification.updateMany({
+    where: { userId, read: false },
     data: { read: true },
   });
 }
