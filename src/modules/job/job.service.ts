@@ -4,7 +4,7 @@ import { IJobCreate, IJobUpdate } from './job.types';
 /**
  * Tạo job mới
  */
-export async function createJob(data: IJobCreate) {
+export async function createJob(data: IJobCreate & { employerId: string }) {
   return prisma.job.create({ data });
 }
 

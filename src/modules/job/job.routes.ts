@@ -7,13 +7,30 @@ import {
   handleDeleteJob,
 } from './job.controller';
 import { authenticateToken } from '../auth/auth.middleware';
+import { authorizeRole } from '../user/user.middleware';
+import { Role } from '@prisma/client';
 
 const router = Router();
 
 router.get('/', handleGetJobs);
 router.get('/:id', handleGetJobById);
-router.post('/', authenticateToken, handleCreateJob);
-router.put('/:id', authenticateToken, handleUpdateJob);
-router.delete('/:id', authenticateToken, handleDeleteJob);
+router.post(
+  '/',
+  authenticateToken,
+  authorizeRole([Role.EMPLOYER, Role.PREMIUM_EMPLOYER]),
+  handleCreateJob
+);
+router.put(
+  '/:id',
+  authenticateToken,
+  authorizeRole([Role.EMPLOYER, Role.PREMIUM_EMPLOYER]),
+  handleUpdateJob
+);
+router.delete(
+  '/:id',
+  authenticateToken,
+  authorizeRole([Role.EMPLOYER, Role.PREMIUM_EMPLOYER]),
+  handleDeleteJob
+);
 
 export default router;
