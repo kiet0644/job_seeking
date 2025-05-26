@@ -3,6 +3,7 @@ import {
   handleGetUserProfile,
   handleUpdateUserProfile,
   handleCreateUserProfile,
+  handleGetUserProfileById,
 } from './user.controller';
 import { authenticateToken } from '../auth/auth.middleware';
 import { authorizeRole } from './user.middleware';
@@ -18,6 +19,14 @@ router.put('/profile', authenticateToken, handleUpdateUserProfile);
 
 // Tạo hồ sơ người dùng (tất cả người dùng đều có thể truy cập)
 router.post('/profile', authenticateToken, handleCreateUserProfile);
+
+// Lấy thông tin hồ sơ người dùng theo ID (chỉ dành cho ADMIN và MODERATOR)
+router.get(
+  '/profile/:userId',
+  authenticateToken,
+  authorizeRole([Role.ADMIN, Role.MODERATOR]),
+  handleGetUserProfileById
+);
 
 // Route chỉ dành cho ADMIN
 router.get(
