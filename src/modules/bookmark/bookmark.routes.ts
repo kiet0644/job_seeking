@@ -11,7 +11,7 @@ const router = Router();
 
 router.post('/', authenticateToken, handleCreateBookmark);
 router.get('/', authenticateToken, handleGetBookmarksByUser);
-router.get('/job/:jobId', authenticateToken, handleGetBookmarksByJob);
+router.get('/job/:jobI', authenticateToken, handleGetBookmarksByJob);
 router.delete('/:id', authenticateToken, handleDeleteBookmark);
 
 export default router;
