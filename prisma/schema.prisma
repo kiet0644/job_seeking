@@ -16,6 +16,19 @@ enum Role {
   PREMIUM_EMPLOYER
 }
 
+enum SubscriptionType {
+  PREMIUM_JOB_SEEKER
+  PREMIUM_EMPLOYER
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  FREELANCE
+}
+
 model User {
   id             String   @id @map("_id") @default(auto()) @db.ObjectId
   email          String   @unique
@@ -26,10 +39,11 @@ model User {
   address        String?
   role           Role     @default(JOB_SEEKER)
   emailVerified  Boolean  @default(false)
+  provider       String?  // For social login (e.g., google, facebook)
+  providerId     String?  // Social provider user id
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  // Quan hệ với các bảng khác
   jobSeekerProfile   JobSeekerProfile?
   employerProfile    EmployerProfile?
   applications       Application[]
@@ -41,31 +55,47 @@ model User {
   bookmarks          Bookmark[]
   resumes            Resume[]
   subscriptions      Subscription[]
+  jobs               Job[]           @relation("UserJobs")
+
+  @@index([role])
 }
 
 model Application {
   id        String   @id @map("_id") @default(auto()) @db.ObjectId
   userId    String
   jobId     String
+  resumeId  String?
   status    String   @default("pending") // pending | accepted | rejected
+  coverLetter String?
   appliedAt DateTime @default(now())
 
-  // Quan hệ với User
-  user User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  job    Job    @relation(fields: [jobId], references: [id])
+  resume Resume? @relation(fields: [resumeId], references: [id])
 
-  // Quan hệ với Job
-  job Job @relation(fields: [jobId], references: [id])
+  @@index([userId])
+  @@index([jobId])
 }
 
 model Job {
   id          String   @id @map("_id") @default(auto()) @db.ObjectId
   title       String
   description String
+  employerId  String
+  location    String?
+  salary      String?
+  jobType     JobType?
+  deadline    DateTime?
+  requirements String?
+  benefits    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  employer    User     @relation("UserJobs", fields: [employerId], references: [id])
   applications Application[]
   bookmarks    Bookmark[]
+
+  @@index([employerId])
 }
 
 model JobSeekerProfile {
@@ -75,22 +105,20 @@ model JobSeekerProfile {
   skills           String[]
   careerObjective  String?
 
-  // Quan hệ với User
   user User @relation(fields: [userId], references: [id])
 }
 
 model EmployerProfile {
   id             String   @id @map("_id") @default(auto()) @db.ObjectId
   userId         String   @unique
-  companyName    String   // Bắt buộc
-  companyAddress String   // Bắt buộc
-  companyWebsite String?  // Không bắt buộc
-  companyLogo    String?  // Không bắt buộc
-  contactPerson  String   // Bắt buộc
-  contactEmail   String   // Bắt buộc
-  contactPhone   String   // Bắt buộc
+  companyName    String
+  companyAddress String
+  companyWebsite String?
+  companyLogo    String?
+  contactPerson  String
+  contactEmail   String
+  contactPhone   String
 
-  // Quan hệ với User
   user User @relation(fields: [userId], references: [id])
 }
 
@@ -101,6 +129,8 @@ model Notification {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model Bookmark {
@@ -110,6 +140,9 @@ model Bookmark {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   job       Job      @relation(fields: [jobId], references: [id])
+
+  @@index([userId])
+  @@index([jobId])
 }
 
 model Review {
@@ -122,15 +155,21 @@ model Review {
 
   reviewer    User     @relation("UserReviews", fields: [reviewerId], references: [id])
   employer    User     @relation("UserEmployers", fields: [employerId], references: [id])
+
+  @@index([reviewerId])
+  @@index([employerId])
 }
 
 model Resume {
   id        String   @id @map("_id") @default(auto()) @db.ObjectId
   userId    String
-  url       String   // Link tới file CV
+  url       String
   title     String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+  applications Application[] // <-- Add this line
+
+  @@index([userId])
 }
 
 model ChatMessage {
@@ -142,14 +181,19 @@ model ChatMessage {
 
   fromUser   User     @relation("UserSentMessages", fields: [fromUserId], references: [id])
   toUser     User     @relation("UserReceivedMessages", fields: [toUserId], references: [id])
+
+  @@index([fromUserId])
+  @@index([toUserId])
 }
 
 model Subscription {
-  id         String   @id @map("_id") @default(auto()) @db.ObjectId
+  id         String           @id @map("_id") @default(auto()) @db.ObjectId
   userId     String
-  type       String   // premium, employer, etc.
+  type       SubscriptionType
   startDate  DateTime
   endDate    DateTime
-  isActive   Boolean  @default(true)
-  user       User     @relation(fields: [userId], references: [id])
+  isActive   Boolean          @default(true)
+  user       User             @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }

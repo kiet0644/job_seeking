@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import prisma from '@/prismaClient';
 import { sendEmail } from '@/utils/email.service';
 import { IUserPayload, IAuthRegisterBody, IAuthLoginBody } from './auth.types';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -55,7 +55,7 @@ export async function registerUser({
  */
 export async function loginUser(
   body: IAuthLoginBody
-): Promise<{ token: string } | { error: string }> {
+): Promise<{ token: string; user: User } | { error: string }> {
   const user = await prisma.user.findUnique({
     where: { email: body.email },
   });
@@ -72,7 +72,8 @@ export async function loginUser(
   const payload: IUserPayload = { id: user.id, email: user.email };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-  return { token };
+  // Sau khi xác thực thành công:
+  return { token, user }; // user là thông tin user lấy từ DB
 }
 
 /**

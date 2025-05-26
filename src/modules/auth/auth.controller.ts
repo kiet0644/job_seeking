@@ -8,6 +8,8 @@ import {
   verifyEmail,
   logout,
 } from './auth.service';
+import { AuthRequest } from './auth.types'; // <-- Thêm dòng này
+import { registerSchema } from './auth.validation';
 
 /**
  * Handles user registration.
@@ -23,13 +25,18 @@ import {
  */
 
 export async function register(req: Request, res: Response) {
+  try {
+    registerSchema.parse(req.body); // Validate input
+  } catch (err: any) {
+    return res
+      .status(400)
+      .json({ error: err.errors?.[0]?.message || 'Invalid input' });
+  }
   const registrationResult = await registerUser(req.body);
-
   if ('error' in registrationResult) {
-    res.status(400).json({ message: registrationResult.error });
+    res.status(400).json({ error: registrationResult.error });
     return;
   }
-
   res.status(201).json({ message: registrationResult.message });
 }
 
@@ -49,7 +56,14 @@ export async function register(req: Request, res: Response) {
 export async function login(req: Request, res: Response): Promise<void> {
   const result = await loginUser(req.body);
   if ('error' in result) {
-    res.status(400).json({ message: result.error });
+    res.status(400).json({ error: result.error });
+    return;
+  }
+  // Giả sử loginUser trả về user info
+  if (result.user && !result.user.emailVerified) {
+    res
+      .status(403)
+      .json({ error: 'Please verify your email before logging in.' });
     return;
   }
   res.json({ token: result.token });
@@ -77,11 +91,11 @@ export async function handlePasswordReset(
  * Handles password change.
  */
 export async function handleChangePassword(
-  req: Request,
+  req: AuthRequest, // <-- Đổi từ Request sang AuthRequest
   res: Response
 ): Promise<void> {
   const { newPassword } = req.body;
-  const userId = req.user?.id; // Lấy userId từ token (middleware authenticateToken phải gắn user vào req)
+  const userId = req.user?.id;
 
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
