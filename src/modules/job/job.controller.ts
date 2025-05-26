@@ -58,3 +58,25 @@ export async function handleDeleteJob(req: Request, res: Response) {
     res.status(404).json({ error: 'Job not found or delete failed' });
   }
 }
+
+export async function handleSearchJobs(req: Request, res: Response) {
+  const {
+    keyword,
+    location,
+    jobType,
+    salaryMin,
+    salaryMax,
+    page = 1,
+    limit = 20,
+  } = req.query;
+  const jobs = await jobService.searchJobs({
+    keyword: keyword as string,
+    location: location as string,
+    jobType: jobType as string,
+    salaryMin: salaryMin ? Number(salaryMin) : undefined,
+    salaryMax: salaryMax ? Number(salaryMax) : undefined,
+    page: Number(page),
+    limit: Number(limit),
+  });
+  res.json(jobs);
+}

@@ -84,6 +84,8 @@ model Job {
   employerId  String
   location    String?
   salary      String?
+  salaryMin   Int?
+  salaryMax   Int?
   jobType     JobType?
   deadline    DateTime?
   requirements String?

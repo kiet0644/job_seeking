@@ -1,5 +1,6 @@
 import prisma from '@/prismaClient';
 import { IJobCreate, IJobUpdate } from './job.types';
+import { JobType } from '@prisma/client'; // Thêm dòng này
 
 /**
  * Tạo job mới
@@ -43,4 +44,49 @@ export async function updateJob(jobId: string, data: IJobUpdate) {
  */
 export async function deleteJob(jobId: string) {
   return prisma.job.delete({ where: { id: jobId } });
+}
+
+/**
+ * Tìm kiếm job
+ */
+export async function searchJobs({
+  keyword,
+  location,
+  jobType,
+  salaryMin,
+  salaryMax,
+  page = 1,
+  limit = 20,
+}: {
+  keyword?: string;
+  location?: string;
+  jobType?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  page?: number;
+  limit?: number;
+}) {
+  return prisma.job.findMany({
+    where: {
+      AND: [
+        keyword
+          ? {
+              OR: [
+                { title: { contains: keyword, mode: 'insensitive' } },
+                { description: { contains: keyword, mode: 'insensitive' } },
+              ],
+            }
+          : {},
+        location
+          ? { location: { contains: location, mode: 'insensitive' } }
+          : {},
+        jobType ? { jobType: jobType as JobType } : {},
+        salaryMin !== undefined ? { salaryMin: { gte: salaryMin } } : {},
+        salaryMax !== undefined ? { salaryMax: { lte: salaryMax } } : {},
+      ],
+    },
+    orderBy: { createdAt: 'desc' },
+    skip: (page - 1) * limit,
+    take: limit,
+  });
 }

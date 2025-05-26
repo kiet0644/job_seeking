@@ -5,6 +5,7 @@ import {
   handleGetJobById,
   handleUpdateJob,
   handleDeleteJob,
+  handleSearchJobs,
 } from './job.controller';
 import { authenticateToken } from '../auth/auth.middleware';
 import { authorizeRole } from '../user/user.middleware';
@@ -14,6 +15,7 @@ const router = Router();
 
 router.get('/', handleGetJobs);
 router.get('/:id', handleGetJobById);
+router.get('/search', handleSearchJobs);
 router.post(
   '/',
   authenticateToken,
