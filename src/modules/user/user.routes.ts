@@ -4,6 +4,7 @@ import {
   handleUpdateUserProfile,
   handleCreateUserProfile,
   handleGetUserProfileById,
+  handleUpdateAvatar,
 } from './user.controller';
 import { authenticateToken } from '../auth/auth.middleware';
 import { authorizeRole } from './user.middleware';
@@ -27,6 +28,9 @@ router.get(
   authorizeRole([Role.ADMIN, Role.MODERATOR]),
   handleGetUserProfileById
 );
+
+// Cập nhật avatar người dùng
+router.put('/profile/avatar', authenticateToken, handleUpdateAvatar);
 
 // Route chỉ dành cho ADMIN
 router.get(

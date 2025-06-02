@@ -79,3 +79,30 @@ export async function handleGetUserProfileById(
     res.status(404).json({ error: 'User not found' });
   }
 }
+
+/**
+ * Handles updating user avatar.
+ */
+export async function handleUpdateAvatar(
+  req: Request,
+  res: Response
+): Promise<void> {
+  const userId = req.user?.id;
+  const { avatar } = req.body;
+
+  if (!userId) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  if (!avatar) {
+    res.status(400).json({ error: 'Avatar is required' });
+    return;
+  }
+
+  try {
+    const updated = await updateUserProfile(userId, { avatar });
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update avatar' });
+  }
+}

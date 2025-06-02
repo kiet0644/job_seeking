@@ -12,15 +12,38 @@ import {
   HStack,
   Icon,
   useColorModeValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  useDisclosure,
+  Input,
 } from '@chakra-ui/react';
-import { FiMail, FiPhone, FiMapPin, FiCalendar, FiCheckCircle, FiXCircle, FiUser, FiKey } from 'react-icons/fi';
+import { FiMail, FiPhone, FiMapPin, FiCalendar, FiCheckCircle, FiXCircle, FiUser, FiKey, FiUpload } from 'react-icons/fi';
 import { useAuthStore } from '@/store/authStore';
+import { useRef, useState } from 'react';
+import AvatarUpdateModal from './AvatarUpdateModal';
 
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user);
   const bg = useColorModeValue('white', 'gray.800');
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const inputFileRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   if (!user) return <Text>Không tìm thấy thông tin người dùng.</Text>;
+
+  // Xử lý chọn file
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+      // TODO: Gửi file lên server ở đây nếu muốn
+    }
+  };
 
   return (
     <Box
@@ -38,15 +61,31 @@ export default function ProfilePage() {
           p={2}
           rounded="full"
           boxShadow="md"
+          cursor="pointer"
+          transition="all 0.2s"
+          _hover={{ boxShadow: 'lg', opacity: 0.9 }}
+          onClick={onOpen}
+          position="relative"
         >
           <Avatar
             name={user.fullName}
-            src={user.avatar || undefined}
+            src={preview || user.avatar || undefined}
             size="2xl"
             border="3px solid"
             borderColor="teal.400"
             bg="white"
           />
+          <Box
+            position="absolute"
+            bottom={2}
+            right={2}
+            bg="white"
+            rounded="full"
+            p={1}
+            boxShadow="sm"
+          >
+            <Icon as={FiUpload} color="teal.500" boxSize={5} />
+          </Box>
         </Box>
         <Heading size="lg" color="teal.700" textAlign="center">
           {user.fullName}
@@ -103,6 +142,16 @@ export default function ProfilePage() {
       >
         Đổi mật khẩu
       </Button>
+
+      {/* Modal cập nhật avatar */}
+      <AvatarUpdateModal
+        isOpen={isOpen}
+        onClose={onClose}
+        user={user}
+        onSave={(file, preview) => {
+          // TODO: upload file/avatar lên server ở đây nếu muốn
+        }}
+      />
     </Box>
   );
 }
