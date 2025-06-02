@@ -92,7 +92,8 @@ export async function sendPasswordReset(
     expiresIn: '15m',
   });
 
-  const resetLink = `https://your-app.com/reset-password?token=${resetToken}`;
+  const appDomain = process.env.APP_DOMAIN || 'https://your-app.com';
+  const resetLink = `${appDomain}/auth/reset-password?token=${resetToken}`;
   const subject = 'Password Reset Request';
 
   const text = `You requested a password reset. Use the following link to reset your password: ${resetLink}`;
@@ -185,7 +186,8 @@ export async function sendVerificationEmail(
     expiresIn: '1d',
   });
 
-  const verifyLink = `https://your-app.com/verify-email?token=${verifyToken}`;
+  const appDomain = process.env.APP_DOMAIN || 'https://your-app.com';
+  const verifyLink = `${appDomain}/auth/verify-email?token=${verifyToken}`;
   const subject = 'Verify Your Email Address';
 
   const html = `

@@ -27,9 +27,10 @@ export async function register(req: Request, res: Response) {
   try {
     registerSchema.parse(req.body); // Validate input
   } catch (err: any) {
-    return res
+    res
       .status(400)
       .json({ error: err.errors?.[0]?.message || 'Invalid input' });
+    return;
   }
   const registrationResult = await registerUser(req.body);
   if ('error' in registrationResult) {
@@ -65,7 +66,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       .json({ error: 'Please verify your email before logging in.' });
     return;
   }
-  res.json({ token: result.token });
+  res.json({ token: result.token, user: result.user });
 }
 
 /**
