@@ -6,6 +6,7 @@ import {
 import { FiUser, FiLock, FiLogOut } from 'react-icons/fi';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
 
 export default function UserMenu() {
   const user = useAuthStore((s) => s.user);
@@ -22,7 +23,7 @@ export default function UserMenu() {
       >
         <Avatar
           name={user?.fullName}
-          src={user?.avatar || undefined}
+          src={getAvatarUrl(user?.avatar)}
           size="sm"
           border="2px solid"
           borderColor="teal.400"

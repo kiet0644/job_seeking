@@ -26,6 +26,7 @@ import { FiMail, FiPhone, FiMapPin, FiCalendar, FiCheckCircle, FiXCircle, FiUser
 import { useAuthStore } from '@/store/authStore';
 import { useRef, useState } from 'react';
 import AvatarUpdateModal from './AvatarUpdateModal';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
 
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user);
@@ -69,7 +70,7 @@ export default function ProfilePage() {
         >
           <Avatar
             name={user.fullName}
-            src={preview || user.avatar || undefined}
+            src={preview || getAvatarUrl(user.avatar)}
             size="2xl"
             border="3px solid"
             borderColor="teal.400"

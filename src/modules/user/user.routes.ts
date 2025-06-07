@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import multer from 'multer';
 import {
   handleGetUserProfile,
   handleUpdateUserProfile,
@@ -11,6 +12,7 @@ import { authorizeRole } from './user.middleware';
 import { Role } from '@prisma/client';
 
 const router = Router();
+const upload = multer({ dest: 'uploads/' });
 
 // Lấy thông tin hồ sơ người dùng (tất cả người dùng đều có thể truy cập)
 router.get('/profile', authenticateToken, handleGetUserProfile);
@@ -30,7 +32,12 @@ router.get(
 );
 
 // Cập nhật avatar người dùng
-router.put('/profile/avatar', authenticateToken, handleUpdateAvatar);
+router.put(
+  '/profile/avatar',
+  authenticateToken,
+  upload.single('avatar'), // phải có dòng này!
+  handleUpdateAvatar
+);
 
 // Route chỉ dành cho ADMIN
 router.get(

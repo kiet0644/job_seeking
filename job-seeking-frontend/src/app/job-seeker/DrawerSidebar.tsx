@@ -4,6 +4,7 @@ import { Stack, HStack, Avatar, Box, Text, Link as ChakraLink, Divider } from '@
 import Link from 'next/link';
 import { sidebarLinks } from './sidebarLinks';
 import { usePathname } from 'next/navigation';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
 
 export default function DrawerSidebar({ user, onClose }: { user: any; onClose?: () => void }) {
   const pathname = usePathname();
@@ -13,7 +14,7 @@ export default function DrawerSidebar({ user, onClose }: { user: any; onClose?: 
       <HStack spacing={4} mb={2}>
         <Avatar
           name={user?.fullName}
-          src={user?.avatar || undefined}
+          src={getAvatarUrl(user?.avatar)}
           size="lg"
           border="2px solid"
           borderColor="teal.400"

@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
+import multer from 'multer';
 import {
   createUserProfile,
   getUserProfile,
   updateUserProfile,
 } from './user.service';
+
+const upload = multer({ dest: 'uploads/' }); // hoặc cấu hình lưu trữ cloud
 
 /**
  * Handles creating user profile.
@@ -83,26 +86,27 @@ export async function handleGetUserProfileById(
 /**
  * Handles updating user avatar.
  */
-export async function handleUpdateAvatar(
-  req: Request,
-  res: Response
-): Promise<void> {
+export const handleUpdateAvatar = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user?.id;
-  const { avatar } = req.body;
+  // Nếu FE gửi field là 'avatar'
+  const file = req.file;
 
   if (!userId) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
-  if (!avatar) {
-    res.status(400).json({ error: 'Avatar is required' });
+  if (!file) {
+    res.status(400).json({ error: 'Avatar file is required' });
     return;
   }
 
+  // Ví dụ: Lưu đường dẫn file vào DB, hoặc upload lên cloud rồi lấy URL
+  const avatarUrl = `/uploads/${file.filename}`; // hoặc URL cloud
+
   try {
-    const updated = await updateUserProfile(userId, { avatar });
+    const updated = await updateUserProfile(userId, { avatar: avatarUrl });
     res.status(200).json(updated);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update avatar' });
   }
-}
+};

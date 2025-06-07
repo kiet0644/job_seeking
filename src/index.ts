@@ -25,6 +25,9 @@ async function startServer() {
     app.use(cors());
     app.use(morgan('dev'));
 
+    // Phục vụ file tĩnh trong thư mục uploads
+    app.use('/uploads', express.static('uploads'));
+
     app.use('/auth', authRouter);
     app.use('/user', userRouter);
     app.use('/jobs', jobRouter);

@@ -18,6 +18,18 @@ import { FiUpload } from 'react-icons/fi';
 import { useRef, useState } from 'react';
 import AvatarCropper from './AvatarCropper';
 import getCroppedImg from './utils/cropImage';
+import { updateAvatar } from '@/api/user';
+import { getAvatarUrl } from '@/utils/getAvatarUrl';
+
+function base64ToFile(base64: string, filename: string): File {
+  const arr = base64.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || '';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new File([u8arr], filename, { type: mime });
+}
 
 export default function AvatarUpdateModal({
   isOpen,
@@ -45,10 +57,12 @@ export default function AvatarUpdateModal({
 
   const handleSave = async () => {
     if (preview && croppedAreaPixels) {
-      const croppedImg = await getCroppedImg(preview, croppedAreaPixels);
-      if (onSave) onSave(file, croppedImg);
+      const croppedImg = await getCroppedImg(preview, croppedAreaPixels); // base64
+      const file = base64ToFile(croppedImg, 'avatar.jpg');
+      await updateAvatar(file);
+      onClose();
+      // Reload user info nếu cần
     }
-    onClose();
   };
 
   return (
@@ -67,7 +81,7 @@ export default function AvatarUpdateModal({
             ) : (
               <Avatar
                 size="2xl"
-                src={user.avatar || undefined}
+                src={getAvatarUrl(user.avatar)}
                 name={user.fullName}
                 border="3px solid"
                 borderColor="teal.400"

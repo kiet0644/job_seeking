@@ -49,9 +49,17 @@ export default function JobSeekerLayout({ children }: { children: React.ReactNod
       >
         <HStack spacing={10}>
           {/* Logo hoặc tên app */}
-          <Text fontWeight="bold" fontSize="xl" color="teal.600" letterSpacing="wide">
-            JobSeeker
-          </Text>
+          <ChakraLink
+            as={Link}
+            href="/"
+            _hover={{ textDecoration: 'none' }}
+            display="flex"
+            alignItems="center"
+          >
+            <Text fontWeight="bold" fontSize="xl" color="teal.600" letterSpacing="wide">
+              JobSeeker
+            </Text>
+          </ChakraLink>
           {sidebarLinks.map((link) => (
             <ChakraLink
               as={Link}

@@ -58,7 +58,7 @@ export default function LoginPage() {
               const res = await login(values.email, values.password);
               useAuthStore.getState().setAuth(res.data.token, res.data.user);
 
-              toast({ title: 'Đăng nhập thành công!', status: 'success', duration: 2000 });
+              toast({ title: 'Đăng nhập thành công!', status: 'success', duration: 2000, position: 'top' });
 
               // Redirect theo role
               switch (res.data.user.role) {
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 err.response?.data?.error ||
                 err.response?.data?.message ||
                 'Đăng nhập thất bại';
-              toast({ title: msg, status: 'error', duration: 3000 });
+              toast({ title: msg, status: 'error', duration: 3000, position: 'top' });
               if (msg.toLowerCase().includes('email')) setErrors({ email: msg });
               else if (msg.toLowerCase().includes('password')) setErrors({ password: msg });
             } finally {

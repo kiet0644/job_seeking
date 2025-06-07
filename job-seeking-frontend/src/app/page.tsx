@@ -1,7 +1,36 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
+import { UserRole } from '@/types/role';
+
 export default function Home() {
-  return (
-    <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <h1 style={{ fontSize: 32, color: '#319795' }}>Chào mừng đến với Job Seeking App!</h1>
-    </main>
-  );
+  const user = useAuthStore((s) => s.user);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.replace('/auth/login');
+      return;
+    }
+    // Chuyển hướng theo role
+    if (
+      user.role === UserRole.JobSeeker ||
+      user.role === UserRole.PremiumJobSeeker
+    ) {
+      router.replace('/job-seeker');
+    } else if (
+      user.role === UserRole.Employer ||
+      user.role === UserRole.PremiumEmployer
+    ) {
+      router.replace('/employer');
+    } else if (user.role === UserRole.Admin || user.role === UserRole.Moderator) {
+      router.replace('/admin');
+    } else {
+      router.replace('/auth/login');
+    }
+  }, [user, router]);
+
+  return null;
 }
