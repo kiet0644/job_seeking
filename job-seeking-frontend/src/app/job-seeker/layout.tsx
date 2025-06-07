@@ -19,15 +19,17 @@ import {
 import { HamburgerIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
-import { sidebarLinks } from './sidebarLinks';
+import { getSidebarLinks } from '@/app/sidebarLinks';
 import DrawerSidebar from './DrawerSidebar';
 import UserMenu from './UserMenu';
 import { usePathname } from 'next/navigation';
+import { UserRole } from '@/types/enums';
 
 export default function JobSeekerLayout({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((s) => s.user);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const pathname = usePathname();
+  const sidebarLinks = getSidebarLinks(user?.role as UserRole);
 
   return (
     <Flex minH="100vh" direction="column" bg="gray.50">

@@ -2,12 +2,14 @@
 
 import { Stack, HStack, Avatar, Box, Text, Link as ChakraLink, Divider } from '@chakra-ui/react';
 import Link from 'next/link';
-import { sidebarLinks } from './sidebarLinks';
+import { getSidebarLinks } from '@/app/sidebarLinks'; // import hàm bạn vừa tạo
 import { usePathname } from 'next/navigation';
 import { getAvatarUrl } from '@/utils/getAvatarUrl';
+import { UserRole } from '@/types/enums';
 
 export default function DrawerSidebar({ user, onClose }: { user: any; onClose?: () => void }) {
   const pathname = usePathname();
+  const sidebarLinks = getSidebarLinks(user?.role as UserRole); // lấy links theo role
 
   return (
     <Stack spacing={6} align="stretch">

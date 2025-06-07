@@ -1,4 +1,4 @@
-export type Role =
+export type UserRole =
   | 'JOB_SEEKER'
   | 'EMPLOYER'
   | 'ADMIN'
@@ -14,7 +14,7 @@ export type User = {
   phone: string | null;
   avatar: string | null;
   address: string | null;
-  role: Role;
+  role: UserRole;
   emailVerified: boolean;
   provider: string | null;
   providerId: string | null;

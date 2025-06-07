@@ -69,11 +69,23 @@ export async function loginUser(
     return { error: 'Wrong password' };
   }
 
-  const payload: IUserPayload = { id: user.id, email: user.email };
+  // Ký token với đầy đủ thông tin user cần thiết
+  const payload = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    avatar: user.avatar,
+    fullName: user.fullName,
+    phone: user.phone,
+    address: user.address,
+    emailVerified: user.emailVerified,
+    provider: user.provider,
+    providerId: user.providerId,
+    createdAt: user.createdAt,
+  };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-  // Sau khi xác thực thành công:
-  return { token, user }; // user là thông tin user lấy từ DB
+  return { token, user };
 }
 
 /**

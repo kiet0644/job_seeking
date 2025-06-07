@@ -6,6 +6,7 @@ import { JobType } from '@prisma/client'; // Thêm dòng này
  * Tạo job mới
  */
 export async function createJob(data: IJobCreate & { employerId: string }) {
+  console.log('Creating job with data:', data);
   return prisma.job.create({ data });
 }
 

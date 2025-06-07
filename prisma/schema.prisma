@@ -29,6 +29,12 @@ enum JobType {
   FREELANCE
 }
 
+enum JobStatus {
+  OPEN
+  CLOSED
+  DRAFT
+}
+
 model User {
   id             String   @id @map("_id") @default(auto()) @db.ObjectId
   email          String   @unique
@@ -90,6 +96,9 @@ model Job {
   deadline    DateTime?
   requirements String?
   benefits    String?
+  experience  String?
+  level       String?
+  status      JobStatus @default(OPEN)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

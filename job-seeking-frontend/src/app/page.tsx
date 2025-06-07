@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
-import { UserRole } from '@/types/role';
+import { UserRole } from '@/types/enums';
 
 export default function Home() {
   const user = useAuthStore((s) => s.user);
@@ -16,16 +16,16 @@ export default function Home() {
     }
     // Chuyển hướng theo role
     if (
-      user.role === UserRole.JobSeeker ||
-      user.role === UserRole.PremiumJobSeeker
+      user.role === UserRole.JOB_SEEKER ||
+      user.role === UserRole.PREMIUM_JOB_SEEKER
     ) {
       router.replace('/job-seeker');
     } else if (
-      user.role === UserRole.Employer ||
-      user.role === UserRole.PremiumEmployer
+      user.role === UserRole.EMPLOYER ||
+      user.role === UserRole.PREMIUM_EMPLOYER
     ) {
       router.replace('/employer');
-    } else if (user.role === UserRole.Admin || user.role === UserRole.Moderator) {
+    } else if (user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR) {
       router.replace('/admin');
     } else {
       router.replace('/auth/login');

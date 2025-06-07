@@ -27,6 +27,7 @@ export function authenticateToken(
       res.status(403).json({ message: 'Invalid token' });
       return;
     }
+    
     req.user = user as IUserPayload;
     next();
   });

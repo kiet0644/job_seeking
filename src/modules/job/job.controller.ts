@@ -13,6 +13,7 @@ export async function handleCreateJob(req: Request, res: Response) {
     const job = await jobService.createJob({ ...req.body, employerId });
     res.status(201).json(job);
   } catch (error: any) {
+    console.error('Job creation error:', error);
     res
       .status(400)
       .json({ error: error.errors?.[0]?.message || 'Failed to create job' });
