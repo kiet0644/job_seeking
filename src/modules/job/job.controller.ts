@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import * as jobService from './job.service';
 import { jobCreateSchema, jobUpdateSchema } from './job.validation';
+import { z } from 'zod';
+
+const statusSchema = z.object({
+  status: z.enum(['OPEN', 'CLOSED', 'DRAFT']),
+});
 
 export async function handleCreateJob(req: Request, res: Response) {
   try {
@@ -80,4 +85,19 @@ export async function handleSearchJobs(req: Request, res: Response) {
     limit: Number(limit),
   });
   res.json(jobs);
+}
+
+export async function handleUpdateJobStatus(req: Request, res: Response) {
+  try {
+    const job = await jobService.getJobById(req.params.id);
+    if (job.employerId !== req.user?.id) {
+      res.status(403).json({ error: 'Forbidden' });
+      return;
+    }
+    statusSchema.parse(req.body);
+    const updatedJob = await jobService.updateJob(req.params.id, { status: req.body.status });
+    res.json(updatedJob);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Failed to update job status' });
+  }
 }
